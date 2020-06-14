@@ -36,7 +36,7 @@ CREATE TABLE klienci (
    Imie             VARCHAR(30)     NOT NULL,
    Nazwisko         VARCHAR(50)     NOT NULL,
    e_mail           VARCHAR(80)     NOT NULL,
-   telefon          VARCHAR(15)     NOT NULL,
+   telefon          VARCHAR(16)     NOT NULL,
    miejscowosc      VARCHAR(50)     NOT NULL,
    PRIMARY KEY (id_klienta)
 ); 
@@ -61,8 +61,7 @@ CREATE TABLE pensje (
     pensja           VARCHAR(50)   NOT NULL,
     od_daty          DATE          NOT NULL,
     do_daty          DATE          NOT NULL,
-    FOREIGN KEY (id_pracownika)  REFERENCES   pracownicy   (id_pracownika)  ON DELETE CASCADE,
-    PRIMARY KEY (id_pracownika)
+    FOREIGN KEY (id_pracownika)  REFERENCES   pracownicy   (id_pracownika)  ON DELETE CASCADE
 );
 
 CREATE TABLE ceny_paliwa (
