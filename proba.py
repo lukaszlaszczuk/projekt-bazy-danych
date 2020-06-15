@@ -56,7 +56,10 @@ od_daty = [datetime.date(i,1,1) for i in range(2010,2020)]
 od_daty.append(datetime.date(2020,1,1))
 do_daty = [datetime.date(i,12,31) for i in range(2010,2020)]
 do_daty.append(edate_stock)
-ilosc_pracownikow = np.random.poisson(82, len(od_daty))
+ilosc_pracownikow = list(np.random.poisson(80, len(od_daty)))
+for i in ilosc_pracownikow:
+    if i < 75:
+        ilosc_pracownikow[ilosc_pracownikow.index(i)] = 75
 
 print(ilosc_pracownikow,'ilosc_prac')
 lista_id_pracownikow = []
@@ -85,12 +88,12 @@ for i in range(len(od_daty)):
     if od_daty[i].year % 2 == 0 and i > 0:
         podwyzka += 200
     pensja.extend(random.choices(lista_do_losowania_pensji, k = len(lista_id_pracownikow[i])))
-print(len(pensja), len(lista_id_pracownikow)*83)
 pensje = []
 for i in range(len(lista_id_pracownikow)):
     for j in lista_id_pracownikow[i]:
-        pensje.append((j,4000 ,od_daty[i], do_daty[i]))
+        pensje.append((j,pensja[j] ,od_daty[i], do_daty[i]))
 id_pracownikow = list(range(1,lista_id_pracownikow[-1][-1]+1))
+#print(pensje[:30])
 #######################3
 ### akcje i paliwa
 #######################
@@ -180,11 +183,20 @@ for i in range(75):
 #################
 #    oplaty
 ###################
-rodzaj_oplaty = ['oplata']*len(days_stock)
-kwota_transkacji = [600]*len(days_stock)
+dni_ubezpieczen = random.choices(range(1,29), k = len(flota))
+miesiace_ubezpieczen = random.choices(range(1,13), k = len(flota))
 oplaty = []
 for i in range(len(days_stock)):
-    oplaty.append((rodzaj_oplaty[i], kwota_transkacji[i], days_stock[i]))
+    for j in range(len(dni_ubezpieczen)):
+        if dni_ubezpieczen[j] == days_stock[i].day and miesiace_ubezpieczen[j] == days_stock[i].month:
+            oplaty.append(('ubezpieczenie', random.choice(list(np.arange(3000,4000,100))), days_stock[i]))
+print(oplaty[:10])    
+#print(days_stock[:367])
+##rodzaj_oplaty = ['oplata']*len(days_stock)
+##kwota_transkacji = [600]*len(days_stock)
+##oplaty = []
+##for i in range(len(days_stock)):
+##    oplaty.append((rodzaj_oplaty[i], kwota_transkacji[i], days_stock[i]))
 
 #########################
 #  zlecenia
