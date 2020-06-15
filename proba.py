@@ -15,7 +15,7 @@ def faker_generator(kind, n):
 mydb = mysql.connector.connect(
   host="localhost",
   user="root",
-  password="haslo",
+  password="Dzimi1dzimi.",
   database='spedycja'
 )
 
@@ -57,6 +57,7 @@ od_daty.append(datetime.date(2020,1,1))
 do_daty = [datetime.date(i,12,31) for i in range(2010,2020)]
 do_daty.append(edate_stock)
 ilosc_pracownikow = np.random.poisson(82, len(od_daty))
+
 print(ilosc_pracownikow,'ilosc_prac')
 lista_id_pracownikow = []
 for i in range(len(od_daty)):
@@ -76,7 +77,15 @@ for i in range(len(od_daty)):
             lista_id_pracownikow.append(lista_pomocnicza)
         else:
             lista_id_pracownikow.append(lista_id_pracownikow[i-1])
-lista_id_pracownikow
+pensja = []
+podwyzka = 0
+pensja_podstawa = 4800
+lista_do_losowania_pensji = np.arange(pensja_podstawa-400+podwyzka, pensja_podstawa+400+podwyzka, 100)
+for i in range(len(od_daty)):
+    if od_daty[i].year % 2 == 0 and i > 0:
+        podwyzka += 200
+    pensja.extend(random.choices(lista_do_losowania_pensji, k = len(lista_id_pracownikow[i])))
+print(len(pensja), len(lista_id_pracownikow)*83)
 pensje = []
 for i in range(len(lista_id_pracownikow)):
     for j in lista_id_pracownikow[i]:
