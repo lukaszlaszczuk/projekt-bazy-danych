@@ -5,8 +5,7 @@ import mysql.connector
 ############################
 mydb = mysql.connector.connect(
   host="localhost",
-  user="root",
-  password="haslo",
+  user="root"
 )
 mycursor = mydb.cursor()
 
@@ -14,7 +13,7 @@ mycursor = mydb.cursor()
 #      WCZYTANIE SKRYPTU   #             
 ############################
 
-with open('C:/Users/maciek/projekt-bazy-danych/sql_create_database.sql') as sql_script:
+with open('sql_create_database.sql') as sql_script:
     script = sql_script.read().replace('\n', '')
     
 ############################

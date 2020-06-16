@@ -19,6 +19,9 @@ CREATE TABLE pracownicy (
     Nazwisko           VARCHAR(50)     NOT NULL,
     PRIMARY KEY (id_pracownika)
 );
+ALTER TABLE pracownicy CONVERT TO CHARACTER SET utf8 COLLATE utf8_general_ci;
+ALTER TABLE pracownicy DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;
+
 
 CREATE TABLE flota (
     id_samochodu     INT            NOT NULL,
@@ -29,7 +32,8 @@ CREATE TABLE flota (
     typ_samochodu    VARCHAR(30)    NOT NULL,
     PRIMARY KEY (id_samochodu)
 );
-
+ALTER TABLE flota CONVERT TO CHARACTER SET utf8 COLLATE utf8_general_ci;
+ALTER TABLE flota DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;
 
 CREATE TABLE klienci (
    id_klienta       INT             NOT NULL,
@@ -40,6 +44,8 @@ CREATE TABLE klienci (
    miejscowosc      VARCHAR(50)     NOT NULL,
    PRIMARY KEY (id_klienta)
 ); 
+ALTER TABLE klienci CONVERT TO CHARACTER SET utf8 COLLATE utf8_general_ci;
+ALTER TABLE klienci DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;
 
 CREATE TABLE zlecenia (
     id_zlecenia      INT             NOT NULL,
@@ -55,6 +61,8 @@ CREATE TABLE zlecenia (
     FOREIGN KEY (id_klienta)     REFERENCES   klienci   (id_klienta)     ON DELETE CASCADE,
     PRIMARY KEY (id_zlecenia)
 );
+ALTER TABLE zlecenia CONVERT TO CHARACTER SET utf8 COLLATE utf8_general_ci;
+ALTER TABLE zlecenia DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;
 
 CREATE TABLE pensje (
     id_pracownika    INT           NOT NULL,
@@ -76,6 +84,8 @@ CREATE TABLE oplaty (
     data               DATE            NOT NULL,
     PRIMARY KEY (data)
 );
+ALTER TABLE oplaty CONVERT TO CHARACTER SET utf8 COLLATE utf8_general_ci;
+ALTER TABLE oplaty DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;
 
 CREATE TABLE akcje (
     data               DATE            NOT NULL,
