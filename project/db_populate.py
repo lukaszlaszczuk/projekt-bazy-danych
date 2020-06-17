@@ -3,6 +3,7 @@ import numpy as np
 import datetime
 import logging
 import pandas as pd
+import sys
 from faker import Faker
 from sklearn.preprocessing import scale
 
@@ -131,7 +132,7 @@ def generate_car_data(car_number, typ_samochodu, id_samochodow):
             wagi_samochodow.append(random.choice(list(np.arange(2000, 2600, 100))))
             max_zaladunki.append(3500 - wagi_samochodow[-1])
             spalania.append(wagi_samochodow[-1] * 1 / 120 - 26 / 3)
-        przebiegi.append(random.choice(list(range(30, 1000000))))
+        przebiegi.append(random.choice(list(range(0, 100000))))
 
     flota = []
     for i in range(car_number):
@@ -389,8 +390,8 @@ def generate_pracownicy(lista_id_pracownikow):
     return pracownicy
 
 
-def populate_database():
-    db_connection = MySQLConnector.connect("localhost", "root", database="spedycja")
+def populate_database(host, user, password):
+    db_connection = MySQLConnector.connect(host, user, password, database="spedycja")
     cursor = MySQLConnector.get_cursor(db_connection)
     for table_name in szablon_bazy.keys():
         mySql_insert_query = 'INSERT INTO {}'.format(table_name) + ' (' + \
@@ -405,7 +406,9 @@ def populate_database():
 
 
 if __name__ == "__main__":
-
+    if len(sys.argv) < 4:
+        raise Exception("You have to specify hostname, user and password to Your database")
+    host, user, password = sys.argv[1:]
     sdate_stock = datetime.date(2010, 1, 1)
     edate_stock = datetime.date(2020, 4, 1)
     delta = edate_stock - sdate_stock
@@ -448,4 +451,4 @@ if __name__ == "__main__":
     oplaty = generate_fees(days_stock)
     zlecenia = generate_jobs(petrol_data)
     pracownicy = generate_pracownicy(lista_id_pracownikow)
-    populate_database()
+    populate_database(host, user, password)
