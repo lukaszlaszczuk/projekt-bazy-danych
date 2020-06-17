@@ -2,7 +2,7 @@
 Baza danych firmy spedycyjnej
 
 Aby utworzyć oraz zapełnić danymi bazę danych należy:
-1. Wykonać skrypt `run_process.sh`, który wykona:
+1. Uruchomić skrypt `run_process.sh` za pomocą `bash run_process.sh`, który wykona:
   * instalację potrzebnych pakietów przy pomocy `pip install -r requirements.txt` ;
   * budowę schematu bazy danych przy pomocy pliku `generate_schema.py`
   * wygenerowanie danych do bazy przy pomocy `db_populate.py`
