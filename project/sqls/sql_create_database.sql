@@ -4,7 +4,8 @@ USE spedycja;
 
 SELECT 'CREATING DATABASE STRUCTURE' as 'INFO';
 
-DROP TABLE IF EXISTS pracownicy,
+DROP TABLE IF EXISTS akcje,
+                     pracownicy,
                      flota,
                      klienci,
                      zlecenia, 
@@ -66,7 +67,7 @@ ALTER TABLE zlecenia DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;
 
 CREATE TABLE pensje (
     id_pracownika    INT           NOT NULL,
-    pensja           VARCHAR(50)   NOT NULL,
+    pensja           FLOAT         NOT NULL,
     od_daty          DATE          NOT NULL,
     do_daty          DATE          NOT NULL,
     FOREIGN KEY (id_pracownika)  REFERENCES   pracownicy   (id_pracownika)  ON DELETE CASCADE
@@ -79,10 +80,11 @@ CREATE TABLE ceny_paliwa (
 ); 
 
 CREATE TABLE oplaty (
+    id_oplaty          INT             NOT NULL,
     rodzaj_oplaty      VARCHAR(30)     NOT NULL,
     kwota_transakcji   DOUBLE          NOT NULL,
     data               DATE            NOT NULL,
-    PRIMARY KEY (data)
+    PRIMARY KEY (id_oplaty)
 );
 ALTER TABLE oplaty CONVERT TO CHARACTER SET utf8 COLLATE utf8_general_ci;
 ALTER TABLE oplaty DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;
