@@ -4,6 +4,7 @@ import datetime
 import logging
 import pandas as pd
 from faker import Faker
+from sklearn.preprocessing import scale
 
 from util.MySQLConnector import MySQLConnector
 
@@ -82,12 +83,16 @@ def generate_stock_data(stock_days):
     return akcje
 
 
-def generate_petrol_data(stock_days):
-    ceny_pal = (np.random.normal(4.3, 0.3, len(stock_days)))
-    ceny_pal = np.convolve(ceny_pal, np.ones((40,)) / 40)[(40 - 1):]  # sredia kroczaca
+def load_petrol_data():
+    df_petrol = pd.read_csv('data/ceny_paliwa.csv')
+    df_petrol['Data'] = pd.to_datetime(df_petrol['Data'])
+    return df_petrol
+
+
+def generate_petrol_data(df_petrol):
     ceny_paliwa = []
-    for i in range(len(ceny_pal[:-40])):
-        ceny_paliwa.append(((float((ceny_pal[:-40])[i]), (days_stock[:-40])[i])))
+    for row in df_petrol.iterrows():
+        ceny_paliwa.append((row[1]['Wartosc'], row[1]['Data'].to_pydatetime()))
     return ceny_paliwa
 
 
@@ -150,8 +155,9 @@ def generate_fees(stock_days):
     return oplaty
 
 
-def generate_jobs():
-    il_zlecen = list(np.random.randint(15, 40, len(days_stock)))
+def generate_jobs(df_petrol):
+    scaled_petrol = -0.03 * scale(np.array(df_petrol['Wartosc']).reshape(-1, 1), axis=0).reshape(1, -1)[0]
+    il_zlecen = [int(np.random.lognormal(np.log(15), 0.5)) for _ in range(len(days_stock))]
     # logging.info(f'Całkowita liczba zleceń: {sum(il_zlecen)}')
     id_zlecenia = list(range(1, sum(il_zlecen) + 1))
 
@@ -173,6 +179,8 @@ def generate_jobs():
     kwoty = []
 
     for i in range(len(days_stock)):
+        week = i // 7
+        petrol_coef = scaled_petrol[week]
         potrzebne_sam_ciezarowe = 0
         potrzebne_sam_dostawcze = 0
 
@@ -352,7 +360,7 @@ def generate_jobs():
         id_pracownika.extend(list(wybierany_df_kierowcy['id_kierowcy']))
         id_samochodu.extend(list(wybrane_id_samochodow))
         dystans.extend(list(dystanse[i]))
-        kwoty.extend([0.75 * j if j > 800 else j for j in dystanse[i]])
+        kwoty.extend([round((0.75 + petrol_coef) * j, 2) if j > 800 else round((1 + petrol_coef) * j, 2) for j in dystanse[i]])
         daty_zlecen.extend(list(daty_przyjecia))
         daty_realizacji.extend([days_stock[i]] * (k_dostawcze + k_ciezarowe))
 
@@ -428,15 +436,16 @@ if __name__ == "__main__":
                         'id_zlecenia', 'id_pracownika', 'id_samochodu', 'id_klienta', 'dystans', 'data_przyjecia',
                         'data_realizacji', 'kwota')}
 
+    petrol_data = load_petrol_data()
     lista_id_pracownikow = create_employees(od_daty)
     id_pracownikow = list(range(1, lista_id_pracownikow[-1][-1] + 1))
     pensje = create_salaries(od_daty, do_daty, 4800, 100, lista_id_pracownikow)
     akcje = generate_stock_data(days_stock)
-    ceny_paliwa = generate_petrol_data(days_stock)
+    ceny_paliwa = generate_petrol_data(petrol_data)
     dlugi = generate_liabilities(days_stock)
     klienci = generate_client_data(1350)
     flota = generate_car_data(75, typ_samochodu, id_samochodow)
     oplaty = generate_fees(days_stock)
-    zlecenia = generate_jobs()
+    zlecenia = generate_jobs(petrol_data)
     pracownicy = generate_pracownicy(lista_id_pracownikow)
     populate_database()
