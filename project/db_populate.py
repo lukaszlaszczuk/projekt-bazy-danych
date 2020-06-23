@@ -1,4 +1,6 @@
+import os
 import random
+import re
 import numpy as np
 import datetime
 import logging
@@ -66,21 +68,24 @@ def create_salaries(year_start_vec, year_end_vec, pensja_podstawa, podwyzka_val,
     return pensje
 
 
-def generate_stock_data(stock_days):
-    ceny_akcji = []
-    for i in range(len(stock_days)):
-        if i < 1:
-            ceny_akcji.append(np.random.normal(10, 0.5, 1))
-        else:
-            if ceny_akcji[i - 1] < 3:
-                ceny_akcji.append(np.random.normal(ceny_akcji[i - 1] + 1, 0.5, 1))
-            else:
-                ceny_akcji.append(np.random.normal(ceny_akcji[i - 1], 0.5, 1))
+def get_data_company(comp_list, reg_exp):
+    ar = np.array([float(f'{re.match(reg_exp, i)[1]}{re.match(reg_exp, i)[2]}'.replace(',', '')) if re.match(reg_exp,
+                                                                                                             i) is not None else None
+                   for i in comp_list])[::-1]
+    daily_ar = np.repeat(ar, 63)
+    return daily_ar
 
-    ilosc_emisji = [15000000 / 10] * len(ceny_akcji)
+
+def generate_stock_data(filepath_stock, filepath_shares_out, reg_exp):
+    dates = list(pd.to_datetime(pd.read_csv(filepath_stock)['Date']))
+    stock_vec = list(pd.read_csv(filepath_stock)['Adj Close'])
+    with open(filepath_shares_out) as f:
+        shares_out = f.readlines()
+    shares_out = get_data_company(shares_out, reg_exp) * 1e3
+    shares_out = shares_out[:len(stock_vec)]
     akcje = []
-    for i in range(len(ceny_akcji)):
-        akcje.append((days_stock[i], float(ceny_akcji[i]), ilosc_emisji[i]))
+    for el in zip(dates, stock_vec, shares_out):
+        akcje.append(el)
     return akcje
 
 
@@ -97,11 +102,14 @@ def generate_petrol_data(df_petrol):
     return ceny_paliwa
 
 
-def generate_liabilities(stock_days):
-    kwoty = len(stock_days) * [150000]
+def generate_liabilities(filepath_liabilities, filepath_stock, reg_exp):
+    dates = list(pd.to_datetime(pd.read_csv(filepath_stock)['Date']))
+    with open(filepath_liabilities) as f:
+        liabilities = f.readlines()
+    liabilities = get_data_company(liabilities, reg_exp) * 1e3
     dlugi = []
-    for i in range(len(kwoty)):
-        dlugi.append((stock_days[i], kwoty[i]))
+    for el in zip(dates, liabilities):
+        dlugi.append(el)
     return dlugi
 
 
@@ -132,7 +140,7 @@ def generate_car_data(car_number, typ_samochodu, id_samochodow):
             wagi_samochodow.append(random.choice(list(np.arange(2000, 2600, 100))))
             max_zaladunki.append(3500 - wagi_samochodow[-1])
             spalania.append(wagi_samochodow[-1] * 1 / 120 - 26 / 3)
-        przebiegi.append(random.choice(list(range(0, 100000))))
+        przebiegi.append(random.choice(list(range(30, 100000))))
 
     flota = []
     for i in range(car_number):
@@ -361,7 +369,8 @@ def generate_jobs(df_petrol):
         id_pracownika.extend(list(wybierany_df_kierowcy['id_kierowcy']))
         id_samochodu.extend(list(wybrane_id_samochodow))
         dystans.extend(list(dystanse[i]))
-        kwoty.extend([round((0.75 + petrol_coef) * j, 2) if j > 800 else round((1 + petrol_coef) * j, 2) for j in dystanse[i]])
+        kwoty.extend(
+            [round((0.75 + petrol_coef) * j, 2) if j > 800 else round((1 + petrol_coef) * j, 2) for j in dystanse[i]])
         daty_zlecen.extend(list(daty_przyjecia))
         daty_realizacji.extend([days_stock[i]] * (k_dostawcze + k_ciezarowe))
 
@@ -439,13 +448,18 @@ if __name__ == "__main__":
                         'id_zlecenia', 'id_pracownika', 'id_samochodu', 'id_klienta', 'dystans', 'data_przyjecia',
                         'data_realizacji', 'kwota')}
 
+    reg_exp = re.compile('.{10}(?: \t)(?:\$?)(\d+)(?:\,?)(\d{1,3}?)$')
+    liabilities_path = os.path.join('data', 'liabilities.txt')
+    shares_out_path = os.path.join('data', 'shares_outstanding.txt')
+    stock_price = os.path.join('data', 'stock_prices.csv')
+
     petrol_data = load_petrol_data()
     lista_id_pracownikow = create_employees(od_daty)
     id_pracownikow = list(range(1, lista_id_pracownikow[-1][-1] + 1))
     pensje = create_salaries(od_daty, do_daty, 4800, 100, lista_id_pracownikow)
-    akcje = generate_stock_data(days_stock)
+    akcje = generate_stock_data(stock_price, shares_out_path, reg_exp)
     ceny_paliwa = generate_petrol_data(petrol_data)
-    dlugi = generate_liabilities(days_stock)
+    dlugi = generate_liabilities(liabilities_path, stock_price, reg_exp)
     klienci = generate_client_data(1350)
     flota = generate_car_data(75, typ_samochodu, id_samochodow)
     oplaty = generate_fees(days_stock)
