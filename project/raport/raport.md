@@ -118,8 +118,8 @@ sys.stdout = sys.__stdout__
 sys.stderr = sys.__stderr__
 db_info = pd.read_excel(os.path.join('database-info', 'database_credentials.xlsx'))
 host, user, password = db_info.iloc[0, :].fillna('')
-#subprocess.run(['python', os.path.join('generate_schema.py'), host, user, password])
-#subprocess.run(['python', os.path.join('db_populate.py'), host, user, password])
+subprocess.run(['python', os.path.join('generate_schema.py'), host, user, password])
+subprocess.run(['python', os.path.join('db_populate.py'), host, user, password])
 ```
 
 ## 1. Liczba oczekujących zleceń w czasie
