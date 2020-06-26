@@ -1,5 +1,5 @@
 # projekt-bazy-danych
-###Baza danych firmy spedycyjnej
+### Baza danych firmy spedycyjnej
 
 W celu wygenerowania bazy, najpierw należy upewnić się, czy zainstalowane są wszystkie potrzebne biblioteki języka Python. Lista niezbędnych bibliotek (wraz z ich wersjami) znajduje się w pliku requirements.txt. Możemy je zainstalować w łatwy sposób przy użyciu systemu pip, za pomocą komendy:
 
